@@ -1,0 +1,32 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuth() { return request.auth != null; }
+    function underMB(mb) { return request.resource.size < mb * 1024 * 1024; }
+    function isImage() { return request.resource.contentType.matches('image/.*'); }
+
+    match /job-images/{file} {
+      allow read:  if true;
+      allow write: if isAuth() && isImage() && underMB(5);
+    }
+    match /article-images/{file} {
+      allow read:  if true;
+      allow write: if isAuth() && isImage() && underMB(5);
+    }
+    match /material-thumbnails/{file} {
+      allow read:  if true;
+      allow write: if isAuth() && isImage() && underMB(5);
+    }
+    match /question-images/{file} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && isImage() && underMB(5);
+    }
+    match /material-pdfs/{file} {
+      allow read:  if isAuth();
+      allow write: if isAuth() && request.resource.contentType == 'application/pdf' && underMB(50);
+    }
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

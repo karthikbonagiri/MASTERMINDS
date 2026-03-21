@@ -1,0 +1,109 @@
+/* src/app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand-blue: #1D4ED8;
+    --brand-green: #059669;
+    --brand-orange: #F97316;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl
+           hover:bg-blue-700 active:bg-blue-800 transition-all duration-200 shadow-md hover:shadow-lg
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-60
+           disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 font-semibold rounded-xl
+           border-2 border-blue-600 hover:bg-blue-50 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  .btn-green {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white font-semibold rounded-xl
+           hover:bg-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+
+  .btn-orange {
+    @apply inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white font-semibold rounded-lg
+           hover:bg-orange-600 transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900
+           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+           placeholder:text-gray-400 transition-all duration-200;
+  }
+
+  .label {
+    @apply block text-sm font-semibold text-gray-700 mb-1.5;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .section-title {
+    @apply text-3xl font-display font-bold text-gray-900;
+  }
+
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded-lg;
+  }
+}
+
+/* PDF watermark overlay */
+.pdf-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pdf-watermark span {
+  font-size: 4rem;
+  font-weight: 900;
+  color: rgba(29, 78, 216, 0.12);
+  transform: rotate(-35deg);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Quill editor styles */
+.ql-toolbar { border-radius: 12px 12px 0 0 !important; border-color: #e5e7eb !important; }
+.ql-container { border-radius: 0 0 12px 12px !important; border-color: #e5e7eb !important; min-height: 200px; }
+.ql-editor { min-height: 200px; font-family: var(--font-body); }
+
+/* Test timer pulse when low */
+.timer-warning { animation: timerPulse 1s ease-in-out infinite; }
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

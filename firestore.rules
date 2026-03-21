@@ -1,0 +1,83 @@
+// firestore.rules
+// ============================================================
+// Firestore Security Rules for Master Minds
+// Deploy via Firebase CLI: firebase deploy --only firestore:rules
+// Or paste into Firebase Console → Firestore → Rules
+// ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ─────────────────────────────────────
+    // Returns true if the requesting user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Returns true if the authenticated user has role == "admin"
+    // in the users collection (Firestore lookup)
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid))
+          .data.role == 'admin';
+    }
+
+    // Returns true if the user owns the document (by userId field)
+    function isOwner() {
+      return isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // ── Users collection ─────────────────────────────────────
+    match /users/{uid} {
+      allow read:  if isAdmin() || (isAuthenticated() && request.auth.uid == uid);
+      allow write: if isAdmin();
+      // NOTE: Initial admin creation is done via the Admin SDK (server-side)
+      // or the Settings page's createUserWithEmailAndPassword + setDoc combo.
+    }
+
+    // ── Job Notifications ─────────────────────────────────────
+    match /jobNotifications/{docId} {
+      allow read:   if true;           // Public read
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── Mock Tests ────────────────────────────────────────────
+    match /mockTests/{docId} {
+      allow read:   if true;
+      allow write:  if isAdmin();
+    }
+
+    // ── Mock Test Questions ───────────────────────────────────
+    // Require auth to read (prevents anonymous scraping of question bank)
+    match /mockTestQuestions/{docId} {
+      allow read:   if isAuthenticated();
+      allow write:  if isAdmin();
+    }
+
+    // ── Study Materials ───────────────────────────────────────
+    match /studyMaterials/{docId} {
+      allow read:   if true;           // Metadata is public; file URL is protected
+      allow write:  if isAdmin();
+    }
+
+    // ── Article Posts ─────────────────────────────────────────
+    match /articlePosts/{docId} {
+      allow read:   if true;
+      allow write:  if isAdmin();
+    }
+
+    // ── Purchases ─────────────────────────────────────────────
+    match /purchases/{docId} {
+      // User can read their own purchases; admins can read all
+      allow read:   if isAdmin() || isOwner();
+      // Only server-side (Admin SDK via API routes) writes purchases
+      // For client-side creation (fallback), require auth
+      allow create: if isAuthenticated();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
